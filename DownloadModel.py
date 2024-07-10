@@ -6,11 +6,9 @@ import shutil
 
 
 class DownloadModel:
-    def __init__(self, zip_save_path, zip_extract_path, model_save_path, token_path, model_uid):
+    def __init__(self, zip_save_path, zip_extract_path, token_path):
         self.zip_save_path = zip_save_path
         self.zip_extract_path = zip_extract_path
-        self.model_save_path = model_save_path
-        self.model_uid = model_uid
         
         self.token = self.retrieve_token(token_path)
 
@@ -20,16 +18,14 @@ class DownloadModel:
         return f.read()
     
 
-    def download(self):    
+    def download(self, model_uid):    
 
-        model_save_path = self.model_save_path
         zip_extract_path = self.zip_extract_path
         zip_save_path = self.zip_save_path
 
         try:
             shutil.rmtree(zip_extract_path)
             os.remove(zip_save_path)
-            os.remove(model_save_path)
         except Exception as e:
             pass
 
@@ -37,7 +33,7 @@ class DownloadModel:
 
         # Place access token from sketchfab here
         ACCESS_TOKEN = self.token
-        UID = self.model_uid
+        UID = model_uid
 
         response = requests.get(f'https://api.sketchfab.com/v3/models/{UID}/download', headers={'authorization': f'Token {ACCESS_TOKEN}'})
 
@@ -45,7 +41,6 @@ class DownloadModel:
         if response.status_code == 200:
             download_info = response.json()
             download_url = download_info['gltf']['url']
-            print(download_url)
         else:
             raise Exception('Error while trying to get download link')
 
@@ -60,10 +55,14 @@ class DownloadModel:
             raise Exception('Error while trying to download model')
 
 
-    def extract_from_zip(self):
-        model_save_path = self.model_save_path
+    def extract_from_zip(self, model_save_path):
         zip_extract_path = self.zip_extract_path
         zip_save_path = self.zip_save_path
+
+        try:
+            os.remove(model_save_path)
+        except Exception as e:
+            pass
 
         # Extracting from zip archive
         with zipfile.ZipFile(zip_save_path, 'r') as zip_ref:
@@ -96,8 +95,3 @@ class DownloadModel:
                         break
         
         return model_save_path
-
-
-model_download = DownloadModel("model.zip", "extracted/", "model.obj", "TOKEN.txt", "9adaa8f926904134968cfd6a5e1a042a")
-model_download.download()
-model_download.extract_from_zip()
