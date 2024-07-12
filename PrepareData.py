@@ -7,17 +7,31 @@ class PrepareData:
     def __init__(self, uids_path):
         self.uids = self.parse_uids(uids_path)
 
-    def prepare(self, temp_model_path, image_folder_path, view_num):
+    def prepare(self, image_folder_path, view_num):
         download_model = DownloadModel("model.zip", "extracted/", "TOKEN.txt")
         preprocess = Preprocess()
 
         image_cnt = 0
         for uid in self.uids:
             time.sleep(2)
-            download_model.download(uid)
-            download_model.extract_from_zip(temp_model_path)
+
+            try:
+                download_model.download(uid)
+            except Exception as e:
+                print("Error while downloading occured")
+
+            try:
+                model_temp_path = download_model.extract_from_zip()
+            except Exception as e:
+                print("Error while extracting occured")
+
             print("Model extracted")
-            preprocess.prepare(temp_model_path, image_folder_path, image_cnt)
+
+            try:
+                preprocess.prepare(model_temp_path, image_folder_path, image_cnt)
+            except Exception as e:
+                print("Error while creating shades occured")
+                
             print("Shades created")
             image_cnt += view_num
 
@@ -33,5 +47,5 @@ class PrepareData:
     
 
 prepare_data = PrepareData("uids.txt")
-prepare_data.prepare('model.obj', 'images', 48)
+prepare_data.prepare('images', 48)
         

@@ -55,14 +55,9 @@ class DownloadModel:
             raise Exception('Error while trying to download model')
 
 
-    def extract_from_zip(self, model_save_path):
+    def extract_from_zip(self):
         zip_extract_path = self.zip_extract_path
         zip_save_path = self.zip_save_path
-
-        try:
-            os.remove(model_save_path)
-        except Exception as e:
-            pass
 
         # Extracting from zip archive
         with zipfile.ZipFile(zip_save_path, 'r') as zip_ref:
@@ -74,24 +69,20 @@ class DownloadModel:
         # Converting to obj format if needed
         for root, dirs, files in os.walk(zip_extract_path):
             for file in files:
-                if file.endswith('.gltf'):
-                    gltf_file = os.path.join(root, file)
-                    break
                 if file.endswith('.zip'):
                     second_zip = os.path.join(root, file)
-                    break
+                    with zipfile.ZipFile(second_zip, 'r') as zip_ref:
+                        zip_ref.extractall(zip_extract_path)
 
+        for root, dirs, files in os.walk(zip_extract_path):
+            for file in files:
+                if file.endswith('.gltf'):
+                    gltf_file = os.path.join(root, file)
+
+        '''
         if gltf_file:
             mesh = trimesh.load(gltf_file)
             mesh.export(model_save_path)
-        elif second_zip:
-            with zipfile.ZipFile(second_zip, 'r') as zip_ref:
-                zip_ref.extractall(zip_extract_path)
-
-            for root, dirs, files in os.walk(zip_extract_path):
-                for file in files:
-                    if file.endswith('.gltf'):
-                        gltf_file = os.path.join(root, file)
-                        break
+        '''
         
-        return model_save_path
+        return gltf_file

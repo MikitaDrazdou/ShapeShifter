@@ -8,11 +8,14 @@ class Preprocess:
     def prepare(self, model_path, image_folder_path, start_num):
         filename = model_path
         
-        mesh = pv.read(filename)
+        block = pv.read(filename)
+        mesh = block.combine()
+        print(mesh.array_names)
 
         screens = []
 
         rotation_point = [0, 0, 0]
+
 
         def save_screenshot(mesh, step, save_folder_path):
             plotter = pv.Plotter(off_screen=True, lighting="none")
@@ -51,7 +54,3 @@ class Preprocess:
         print("Screenshots saved:")
         for screenshot in screens:
             print(screenshot)
-
-prep = Preprocess()
-prep.prepare("model.obj", "images", 0)
-    
