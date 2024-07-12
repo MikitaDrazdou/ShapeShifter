@@ -1,7 +1,7 @@
 from DownloadModel import DownloadModel
 from Preprocess import Preprocess
 
-import requests
+import time
 
 class PrepareData:
     def __init__(self, uids_path):
@@ -13,9 +13,12 @@ class PrepareData:
 
         image_cnt = 0
         for uid in self.uids:
+            time.sleep(2)
             download_model.download(uid)
             download_model.extract_from_zip(temp_model_path)
+            print("Model extracted")
             preprocess.prepare(temp_model_path, image_folder_path, image_cnt)
+            print("Shades created")
             image_cnt += view_num
 
 

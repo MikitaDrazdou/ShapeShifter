@@ -5,25 +5,32 @@ class ParseUIDS:
     def __init__(self, uid_path):
         self.uid_path = uid_path
 
-
-    def fetch_uids(self, BASE_URL, HEADERS, params):
+    def fetch_uids(self, BASE_URL, HEADERS, params, MAX_SIZE_MB):
         uids = []
         
         next_url = BASE_URL
-        while len(uids) < 5000 and next_url:
+        
+        while len(uids) < 500 and next_url:
             response = requests.get(next_url, headers=HEADERS, params=params if next_url == BASE_URL else None)
             if response.status_code == 200:
                 data = response.json()
                 models = data.get('results', [])
                 
                 for model in models:
-                    if len(uids) >= 5000:
+                    if len(uids) >= 500:
                         break
                     uid = model['uid']
-                    uids.append(uid)
+                    if model['archives']['gltf']['size'] < MAX_SIZE_MB * 1024 * 1024:
+                        uids.append(uid)
                 
                 # Get the next URL for pagination
                 next_url = data.get('next')
+
+                while not next_url:
+                    print("Rate limit, retrying")
+                    next_url = data.get('next')
+                    time.sleep(2)
+
                 if next_url:
                     print(f'Fetching next page: {next_url}')
             else:
@@ -31,11 +38,11 @@ class ParseUIDS:
                 break
 
             # Respect API rate limits
-            time.sleep(1)  # Adjust the sleep time based on API rate limits
+            time.sleep(5)  # Adjust the sleep time based on API rate limits
 
         return uids
 
-    def parse(self):
+    def parse(self, MAX_FILE_SIZE_MB):
 
         # Replace 'YOUR_API_TOKEN' with your actual Sketchfab API token
         f = open("TOKEN.txt", 'r')
@@ -52,15 +59,15 @@ class ParseUIDS:
             'license': 'CC0,CC-BY,CC-BY-SA',  # Filter to include only free models (with permissive licenses)
             'sort_by': '-likeCount',  # Optional: Sort by most liked models
             'type': 'models',
-            'q': ''  # Optional: Add any specific search query
+            'q': ''
         }
 
-        # Fetch the first 5000 UIDs
-        uids = self.fetch_uids(BASE_URL, HEADERS, params)
+        # Fetch the UIDs based on the modified parameters
+        uids = self.fetch_uids(BASE_URL, HEADERS, params, MAX_FILE_SIZE_MB)
 
         f = open(self.uid_path, 'w')
         for uid in uids:
             f.write(f"{uid}\n")
 
 parser = ParseUIDS("uids.txt")
-parser.parse()
+parser.parse(20)

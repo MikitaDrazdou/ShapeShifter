@@ -7,7 +7,9 @@ class Preprocess:
 
     def prepare(self, model_path, image_folder_path, start_num):
         filename = model_path
+        
         mesh = pv.read(filename)
+
         screens = []
 
         rotation_point = [0, 0, 0]
@@ -34,6 +36,7 @@ class Preprocess:
         angles_y = [0, 90, 150, 240]
         angles_z = [0, 120, 240]
 
+
         for i in range(len(angles_x)):
             for j in range(len(angles_y)):
                 for k in range(len(angles_z)):
@@ -41,10 +44,14 @@ class Preprocess:
                     rotated_mesh.rotate_x(angles_x[i], point=rotation_point, inplace=True)
                     rotated_mesh.rotate_y(angles_y[j], point=rotation_point, inplace=True)
                     rotated_mesh.rotate_z(angles_z[k], point=rotation_point, inplace=True)
-                    print(f"{cnt}: X: {angles_x[i]} Y: {angles_y[j]} Z: {angles_z[k]}")
+                    # print(f"{cnt}: X: {angles_x[i]} Y: {angles_y[j]} Z: {angles_z[k]}")
                     cnt+=1
                     save_screenshot(rotated_mesh, cnt + start_num, image_folder_path)
 
         print("Screenshots saved:")
         for screenshot in screens:
             print(screenshot)
+
+prep = Preprocess()
+prep.prepare("model.obj", "images", 0)
+    
