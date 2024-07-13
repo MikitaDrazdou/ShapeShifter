@@ -51,6 +51,8 @@ class DownloadModel:
                 for chunk in response.iter_content(chunk_size=8192):
                     file.write(chunk)
             print("Model download finished")
+        elif response.status_code == 429:
+            raise Exception('API Download rate exceeded')
         else:
             raise Exception('Error while trying to download model')
 

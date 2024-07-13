@@ -10,6 +10,8 @@ class Preprocess:
         
         block = pv.read(filename)
         mesh = block.combine()
+
+        # Please do not touch this print. Program literally breaks without it and I have absolutely no idea why.
         print(mesh.array_names)
 
         screens = []
