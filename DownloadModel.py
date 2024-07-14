@@ -1,5 +1,4 @@
 import requests
-import trimesh
 import zipfile
 import os
 import shutil
@@ -50,7 +49,6 @@ class DownloadModel:
             with open(zip_save_path, 'wb') as file:
                 for chunk in response.iter_content(chunk_size=8192):
                     file.write(chunk)
-            print("Model download finished")
         elif response.status_code == 429:
             raise Exception('API Download rate exceeded')
         else:
@@ -80,11 +78,5 @@ class DownloadModel:
             for file in files:
                 if file.endswith('.gltf'):
                     gltf_file = os.path.join(root, file)
-
-        '''
-        if gltf_file:
-            mesh = trimesh.load(gltf_file)
-            mesh.export(model_save_path)
-        '''
         
         return gltf_file
