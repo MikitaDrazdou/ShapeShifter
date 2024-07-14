@@ -125,7 +125,7 @@ def train(model, criterion, optimizer, dataloader, num_epochs):
             outputs = model(imgs)
             break
 
-dataloader = create_data_loader(r"/Users/nikitadrozdov/Downloads/images")
+dataloader = create_data_loader(r"_____")
 
 # Set the device      
 device = "mps" if torch.backends.mps.is_available() else "cpu"
