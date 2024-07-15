@@ -47,7 +47,8 @@ class PrepareData:
                 print("Error while creating embeddings occured")
 
             print("Embeddings created, writing to databases...")
-            print(embeddings)
+            
+            
             image_cnt += view_num
 
 
