@@ -31,7 +31,7 @@ class Preprocess:
             except Exception as e:
                 pass
 
-            screenshot = f"{save_folder_path}/model_combined_{step}.png"
+            screenshot = f"{save_folder_path}/{step}.png"
             plotter.show(screenshot=screenshot)
             screens.append(screenshot)
 
@@ -50,8 +50,8 @@ class Preprocess:
                     rotated_mesh.rotate_y(angles_y[j], point=rotation_point, inplace=True)
                     rotated_mesh.rotate_z(angles_z[k], point=rotation_point, inplace=True)
                     # print(f"{cnt}: X: {angles_x[i]} Y: {angles_y[j]} Z: {angles_z[k]}")
-                    cnt+=1
                     save_screenshot(rotated_mesh, cnt + start_num, image_folder_path)
+                    cnt+=1
 
         print("Screenshots saved:")
         for screenshot in screens:
