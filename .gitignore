@@ -1,0 +1,12 @@
+TOKEN.txt
+*.png
+*.obj
+*.gltf
+*.fbx
+*.bin
+*.mtl
+*.zip
+__pycache__/
+extracted/
+*.jpeg
+*.pt

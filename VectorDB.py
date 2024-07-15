@@ -30,13 +30,6 @@ class VectorDB:
 
     def searchNearest(self, collection_name, embedding):
         search_result = self.client.search(
-            collection_name=collection_name, query_vector=embedding, limit=2
+            collection_name=collection_name, query_vector=embedding, limit=5
         )
         return search_result
-
-qdrant = VectorDB()
-qdrant.createCollection("vector_collection", 4)
-qdrant.addVector("vector_collection", [1,2,3,99], 0)
-qdrant.addVector("vector_collection", [1,2,3,100], 1)
-search_result = qdrant.searchNearest("vector_collection", [1,2,3,1010])
-print(search_result)

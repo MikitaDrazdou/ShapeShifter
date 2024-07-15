@@ -1,6 +1,8 @@
 from DownloadModel import DownloadModel
 from Preprocess import Preprocess
 from ImageToEmbed import ImageToEmbed
+from KeyValueDB import KeyValueDB
+from VectorDB import VectorDB
 
 import time
 
@@ -13,9 +15,15 @@ class PrepareData:
         preprocess = Preprocess()
         image_converter = ImageToEmbed()
 
+        qdrant = VectorDB()
+        qdrant.createCollection("vector_collection", 2048)
+
+        postgre = KeyValueDB()
+        postgre.createTable("vector_model")
+
         image_cnt = 0
         for uid in self.uids:
-            time.sleep(2)
+            time.sleep(5)
 
             try:
                 download_model.download(uid)
@@ -46,10 +54,22 @@ class PrepareData:
                 print(e)
                 print("Error while creating embeddings occured")
 
-            print("Embeddings created, writing to databases...")
-            
+            print("Embeddings created, writing to vector database...")
+
+            for i, embedding in enumerate(embeddings):
+                qdrant.addVector("vector_collection", embedding, image_cnt + i)
+
+            print("Wrote to vector database, writing to key-value database...")
+
+            for i, embedding in enumerate(embeddings):
+                postgre.addImage(table_name="vector_model", embedding=str(embedding), url=str(uid))
+
+            print("All done")
             
             image_cnt += view_num
+        
+        postgre.cur.close()
+        postgre.conn.close()
 
 
     def parse_uids(self, uids_path):
