@@ -38,7 +38,7 @@ class Preprocess:
         cnt = 0
 
         angles_x = [0, 90, 150, 240]
-        angles_y = [0, 90, 150, 240]
+        angles_y = [1, 89, 149, 241]
         angles_z = [0, 120, 240]
 
 

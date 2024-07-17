@@ -10,14 +10,14 @@ class ParseUIDS:
         
         next_url = BASE_URL
         
-        while len(uids) < 500 and next_url:
+        while len(uids) < 10000 and next_url:
             response = requests.get(next_url, headers=HEADERS, params=params if next_url == BASE_URL else None)
             if response.status_code == 200:
                 data = response.json()
                 models = data.get('results', [])
                 
                 for model in models:
-                    if len(uids) >= 500:
+                    if len(uids) >= 10000:
                         break
                     uid = model['uid']
                     if model['archives']['gltf']['size'] < MAX_SIZE_MB * 1024 * 1024:
@@ -38,7 +38,7 @@ class ParseUIDS:
                 break
 
             # Respect API rate limits
-            time.sleep(5)  # Adjust the sleep time based on API rate limits
+            #time.sleep(5)  # Adjust the sleep time based on API rate limits
 
         return uids
 

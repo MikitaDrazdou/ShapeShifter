@@ -5,7 +5,7 @@ class PrepareImage:
     def __init__(self):
         pass
     
-    def remove_bg(src_img_path, out_img_path):
+    def remove_bg(self, src_img_path, out_img_path):
         model_choices = ["u2net", "u2net_human_seg", "u2netp"]
         f = open(src_img_path, "rb")
         data = f.read()
@@ -21,7 +21,7 @@ class PrepareImage:
         f.close()
 
 
-    def black_out(src_img_path, out_img_path):
+    def black_out(self, src_img_path, out_img_path):
         im = Image.open(src_img_path)
         alpha = im.getchannel('A')
         alphaThresh = alpha.point(lambda p: 255 if p>200 else 0)
@@ -30,6 +30,10 @@ class PrepareImage:
         res.putalpha(alphaThresh)
         res.save(out_img_path)
 
+    def add_white_background(self, src_img_path, out_img_path):
+        im = Image.open(src_img_path)
 
-remove_bg("test.jpg", "test_fg.png")
-black_out("test_fg.png", "test_black.png")
+        new_im = Image.new("RGBA", im.size, (255, 255, 255))
+
+        new_im.paste(im, (0, 0), im)
+        new_im.save(out_img_path)

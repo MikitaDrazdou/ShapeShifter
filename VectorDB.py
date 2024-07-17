@@ -15,7 +15,12 @@ class VectorDB:
     def createCollection(self, collection_name, vector_size):
         self.client.create_collection(
             collection_name=collection_name,
-            vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
+            vectors_config=VectorParams(size=vector_size, distance=Distance.EUCLID),
+        )
+
+    def deleteCollection(self, collection_name):
+        self.client.delete_collection(
+            collection_name=collection_name,
         )
     
     def addVector(self, collection_name, embedding, i):
@@ -30,6 +35,8 @@ class VectorDB:
 
     def searchNearest(self, collection_name, embedding):
         search_result = self.client.search(
-            collection_name=collection_name, query_vector=embedding, limit=5
+            collection_name=collection_name, query_vector=embedding, limit=3
         )
-        return search_result
+        result = self.client.retrieve(collection_name=collection_name, ids=[search_result[0].id, search_result[1].id, search_result[2].id], with_vectors=True)
+
+        return result

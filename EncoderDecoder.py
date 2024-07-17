@@ -41,12 +41,12 @@ class Autoencoder(nn.Module):
             nn.ReLU()
         )
         self.encoder_fc = nn.Sequential(
-            nn.Linear(512 * 16 * 16, 2048),
+            nn.Linear(512 * 16 * 16, 1024),
             nn.ReLU(),
         )
         # Decoder
         self.decoder_fc = nn.Sequential(
-            nn.Linear(2048, 512 * 16 * 16),
+            nn.Linear(1024, 512 * 16 * 16),
             nn.ReLU()
         )
         self.decoder_conv = nn.Sequential(

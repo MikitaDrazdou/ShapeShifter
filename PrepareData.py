@@ -16,19 +16,20 @@ class PrepareData:
         image_converter = ImageToEmbed()
 
         qdrant = VectorDB()
-        qdrant.createCollection("vector_collection", 2048)
+        #qdrant.deleteCollection("vector_collection")
+        #qdrant.createCollection("vector_collection", 1024)
 
         postgre = KeyValueDB()
-        postgre.createTable("vector_model")
+        #postgre.createTable("vector_model")
 
-        image_cnt = 0
+        image_cnt = 80300
         for uid in self.uids:
-            time.sleep(5)
-
             try:
                 download_model.download(uid)
             except Exception as e:
+                print(e)
                 print("Error while downloading occured")
+                continue
 
             print("Model downloaded, extracting...")
 
@@ -36,6 +37,7 @@ class PrepareData:
                 model_temp_path = download_model.extract_from_zip()
             except Exception as e:
                 print("Error while extracting occured")
+                continue
 
             print("Model extracted, creating shades...")
 
@@ -43,6 +45,7 @@ class PrepareData:
                 preprocess.prepare(model_temp_path, image_folder_path, image_cnt)
             except Exception as e:
                 print("Error while creating shades occured")
+                continue
             
             print("Shades created, creating embeddings...")
             
@@ -53,6 +56,7 @@ class PrepareData:
             except Exception as e:
                 print(e)
                 print("Error while creating embeddings occured")
+                continue
 
             print("Embeddings created, writing to vector database...")
 
@@ -62,7 +66,16 @@ class PrepareData:
             print("Wrote to vector database, writing to key-value database...")
 
             for i, embedding in enumerate(embeddings):
-                postgre.addImage(table_name="vector_model", embedding=str(embedding), url=str(uid))
+                entry = ""
+                for num in embedding:
+                    entry += str(num) + " "
+
+                try:
+                    postgre.addImage(table_name="vector_model", embedding=entry, url=str(uid))
+                except Exception as e:
+                    postgre.conn.rollback()
+                    print(e)
+                    print("Embedding like this was already added, moving further")
 
             print("All done")
             

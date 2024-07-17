@@ -14,7 +14,7 @@ class ImageToEmbed():
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"Using device: {self.device}")
         self.model = Autoencoder().to(self.device)
-        self.model.load_state_dict(torch.load("2000emb.pt"))
+        self.model.load_state_dict(torch.load("1000emb.pt"))
         self.model.eval()
 
     def convert(self, image_path):
